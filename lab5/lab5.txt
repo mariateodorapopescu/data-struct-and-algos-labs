@@ -1,0 +1,171 @@
+//2.
+#include <stdio.h>
+#include <stdlib.h>
+typedef struct cell {
+int elem;
+struct cell *next;
+} QueueCell, *PQueue;
+typedef struct Queue {
+PQueue front, rear;
+} TQueue;
+TQueue initQueue() {
+TQueue q;
+q.front = q.rear = NULL;
+return q;
+}
+int isEmptyQueue(TQueue q) { //ok
+return q.front == NULL;
+}
+TQueue enqueue(TQueue q, int el) { //ok
+PQueue p;
+p = (PQueue) malloc(sizeof(QueueCell));
+if (p == NULL) {
+        exit(-1);
+}
+p->elem = el;
+p->next = NULL;
+if (q.front == NULL)
+q.front = q.rear = p;
+else {
+q.rear->next = p;
+q.rear = p;
+}
+return q;
+}
+TQueue dequeue(TQueue q) { //ok
+PQueue p;
+int el;
+if (q.front == NULL) {
+    exit(-1); }
+el = q.front->elem;
+if (q.front == q.rear) { free(q.front);
+q.front = q.rear = NULL;
+}
+else { p = q.front;
+q.front = q.front->next;
+free(p);
+}
+return q;
+}
+TQueue print(TQueue q) { //ok
+PQueue p;
+int el;
+if (q.front == NULL) {
+    exit(-1); }
+el = q.front->elem;
+printf("%d ", el);
+return q;
+}
+int first(TQueue q) { //ok
+PQueue p;
+int el;
+if (q.front == NULL) {
+    exit(-1); }
+el = q.front->elem;
+return el;
+}
+int last(TQueue q) { //ok
+PQueue p;
+int el;
+if (q.front == NULL) {
+    exit(-1); }
+el = q.rear->elem;
+return el;
+}
+int main() {
+int i,n,x;
+TQueue q;
+q = initQueue();
+scanf("%d",&n);
+for(i=0;i<n;i++)
+{
+    scanf("%d", &x);
+q = enqueue(q, x);
+}
+printf("%d %d",first(q),last(q));
+printf("\n");
+while(!isEmptyQueue(q))
+{
+print(q);
+q=dequeue(q);
+}
+return 0;
+}
+#include <stdio.h>
+#include <stdlib.h>
+typedef struct cell
+{
+    int elem;
+    struct cell *next;
+} Stack, *TStack;
+TStack initStack()
+{
+    TStack s;
+    return s=NULL;
+}
+int isEmptyStack(TStack s)
+{
+    return s==NULL;
+}
+TStack push(TStack s, int element)
+{
+    TStack t;
+    t = (TStack) malloc(sizeof(Stack));
+    if (t == NULL)
+        {
+        return NULL;
+        }
+    t->elem = element;
+    t->next = s;
+    return t;
+}
+TStack pop(TStack s)
+{
+    int element;
+    TStack t;
+    if (s == NULL) {
+    return NULL;
+    }
+    element = s->elem;
+    t = s;
+    s = s->next;
+    free(t);
+    return s;
+}
+int top(TStack s)
+{
+    if (!isEmptyStack(s))
+        return s->elem;
+    else
+    {
+        return -1;
+    }
+}
+void print(TStack s)
+ {
+     while (s!=0)
+     {
+         printf ("%d\n", s->elem);
+         s=s->next;
+     }
+ }
+int main ()
+{
+    int x,n,i;
+    TStack s;
+    s=initStack();
+    i=0;
+    scanf("%d",&n);
+    while (i<n)
+        {
+            scanf("%d", &x);
+            s=push(s, x);
+            i++;
+        }
+    print(s);
+    s=pop(s);
+    printf("dupa pop\n");
+    print(s);
+    return 0;
+}
+

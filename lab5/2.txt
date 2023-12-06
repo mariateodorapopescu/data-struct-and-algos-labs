@@ -1,0 +1,460 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <math.h>
+#include <string.h>
+#include <ctype.h>
+//de testat tot!
+//dar de testat pe bucati
+typedef struct node //structura
+{
+struct nod *prev;
+struct nod *next;
+double timestamp;
+double value;
+}node, *DList;
+void listinit(DList s)
+{
+//functie care initializeaza o lista
+s=(DList)calloc(1,sizeof(node));
+s->prev=NULL;
+s->next=NULL;
+}
+double radical(double n)
+{
+//pentru ca la mine nu merge functia sqrt de care am nevoie la o functie
+double i;
+for (i=0;i<=n;i++)
+if (i*i==n)
+return i;
+}
+void listinsert1(DList s,double val)
+{
+//functie ce insereaza intr-o lista valori la inceputul ei
+//se presupune ca lista a fost deja initializata
+    DList newnode;
+    while(s->next!=NULL)
+        s=s->next;
+    newnode=calloc(1,sizeof(node));
+    newnode->value=val;
+    newnode->prev=s;
+    s->next=newnode;
+    newnode->next=NULL;
+}
+void listinsert2(DList s,double time,double val)
+{
+//functie ce insereaza intr-o lista valori la inceputul ei
+//se presupune ca lista a fost deja initializata
+    DList newnode;
+    while(s->next!=NULL)
+        s=s->next;
+    newnode=calloc(1,sizeof(node));
+    newnode->timestamp=time;
+    newnode->value=val;
+    newnode->prev=s;
+    s->next=newnode;
+    newnode->next=NULL;
+}
+void listdel(DList s,double val)
+{
+    //aici este o functie care doreste sa elimine un nod din lista, cu o anumita valoare
+    node *todel;
+    node *q,*p;
+    todel=s;
+    while(todel->next!=NULL)
+    {
+    //se parcurge lista pana la final
+    q=s->next;
+    if(q->value==val)
+        {
+        //daca s-a gasit un nod cu valoarea cautata
+            todel=s->next; //acesta se sterge cu ajutorul unei variabile ajutatoare
+            s->next=todel->next;
+            p=todel->next;
+            p->prev=s;
+            todel->next=NULL;
+            todel->prev=NULL;
+            free(todel);
+        }
+        s=s->next; //se trece mai departe in cautarea unui nod care ar putea avea valoarea cautata
+    }
+}
+void listfree(DList s)
+{
+//eliberare memorie stergand toate nodurile dintr-o lista
+    node *todel,*q;
+    todel=s;
+    while(todel->next!=NULL)
+            {
+            s->next=todel->next; //se sterge de fiecare data primul nod
+            q=todel->next;
+            q->prev=NULL;
+            free(todel);
+            todel=s;
+            }
+}
+void listprint1(DList s)
+{
+//prima versiune de afisare a listei, asa cum este prezentata in 2.1
+int numarnoduri;
+numarnoduri=0;
+node *cursor;
+cursor=s;
+    while(cursor!=NULL)
+    {
+        cursor=cursor->next; //se parcurge lista cu ajutorul unui cursor
+        numarnoduri++; //se numara cate noduri sunt in lista si se afiseaza
+    }
+    printf("%d\n",numarnoduri);
+    cursor=s;
+    while(cursor!=NULL)
+    {
+    printf("%lf\n",cursor->value); //valorile se afiseaza pe ecran (stdout)
+        cursor=cursor->next;
+    }
+}
+void listprint2(DList s)
+{
+//o a doua varianta de afisare a listei, asa cum este aratat in 2.2
+node *cursor;
+cursor=s;
+printf("[");
+    while(cursor!=NULL)
+    {
+    printf("%lf,",cursor->value); //valorile se afiseaza pe ecran (stdout)
+        cursor=cursor->next; //se parcurge lista cu ajutorul unui cursor
+    }
+    printf("]");
+}
+void listprint3(DList s)
+{
+//prima versiune de afisare a listei, asa cum este prezentata in 2.3
+int numarnoduri;
+numarnoduri=0;
+node *cursor;
+cursor=s;
+    while(cursor!=NULL)
+    {
+        cursor=cursor->next; //se parcurge lista cu ajutorul unui cursor
+        numarnoduri++; //se numara cate noduri sunt in lista si se afiseaza
+    }
+    printf("%d\n",numarnoduri);
+    cursor=s;
+    while(cursor!=NULL)
+    {
+    printf("%lf %lf\n",cursor->timestamp,cursor->value); //valorile se afiseaza pe ecran (stdout)
+        cursor=cursor->next;
+    }
+}
+void listcreate1(DList s)
+{
+//aici aceasta functie creaza o lista, adica dupa ce o initializeaza, pune in ea si valori, in ordinea citirii lor
+//aici se citesc numai valorile, fara timestamp-uri
+int numarnoduri;
+int i;
+double val;
+scanf("%d",&numarnoduri);
+for (i=0;i<numarnoduri;i++)
+{
+scanf("%lf%lf",&val); //valorile de adaugat in lista se citesc de la tastatura (stdin)
+listinsert1(s,val);
+}
+}
+void listcreate2(DList s)
+{
+//aici aceasta functie creaza o lista, adica dupa ce o initializeaza, pune in ea si valori, in ordinea citirii lor
+int numarnoduri;
+int i;
+double val;
+double time;
+scanf("%d",&numarnoduri);
+for (i=0;i<numarnoduri;i++)
+{
+scanf("%lf%lf",&time,&val); //valorile de adaugat in lista se citesc de la tastatura (stdin)
+listinsert2(s,time,val);
+}
+}
+void one(DList s)
+{
+//rezolvarea lui 2.1 -> e1
+node *cursor;
+node *elementinsine;
+node *finish;
+DList start;
+int contor;
+int i;
+double xm;
+double num;
+double sigma;
+double elementinsinev;
+double st,dr; //pentru a calcula mai usor intervalul in care sa se verifice apartenenta numarului
+start=s->next;
+while (finish!=NULL)
+{
+finish=start;
+for (i=0;i<5;i++) //pentru oricare k
+finish=finish->next;
+xm=0; //calculul valorii medii
+contor=0;
+cursor=start;
+while (contor<5) //perntru ca incepe de la 0
+{
+xm=xm+cursor->value;
+cursor=cursor->next;
+contor++;
+}
+xm=xm/5;
+cursor=start;
+contor=0;
+for (i=0;i<5/2;i++) //asta pentru oricare k impar
+elementinsine=start->next; //elementul din mijloc din cele cinci pentru care s-a calculat
+elementinsinev=elementinsine->value;
+sigma=0; //abia acum urmeaza calculul lui sigma
+while (contor<5)
+{
+num=cursor->value-xm;
+sigma=sigma+num*num;
+cursor=cursor->next;
+contor++;
+}
+sigma=sigma/5;
+sigma=radical(sigma);
+st=xm+sigma;
+dr=xm+sigma;
+if (elementinsine->value<st&&elementinsine->value>dr) //daca nu apartine intervalului [st,dr]
+{
+listdel(s,elementinsinev); //il elimina--; //scade numarul de elemente din lista
+}
+start=start->next; //se trece la urmatoarele k valori de numarat, incepand de la start
+}
+listprint1(s); //afiseaza rezultatul
+listfree(s); //elibereaza memoria
+}
+void twoone(DList s)
+{
+DList newlist;
+node *start;
+node *i,*j,*jj;
+node *aux;
+node *q,*p;
+node *finish;
+double toadd;
+int contor1,contor2;
+start=s;
+listinit(newlist);
+while (finish!=NULL)
+{
+finish=start;
+for (i=0;i<5;i++) //pentru oricare k
+finish=finish->next;
+contor1=0;
+contor2=0;
+while (contor1<5-1)
+{
+//se bazeaza pe sortarea prin interschimbare de la vectori, dar e cu liste
+i=start;
+j=i->next;
+while (contor2<(5-contor1))
+{
+    jj=j->next;
+if (i->value>jj->value)
+{
+aux=i;
+i=j;
+j=aux;
+}
+j=j->next;
+contor2++;
+}
+contor1++;
+}
+q=start;
+p=start->next;
+p=p->next;
+toadd=p->value;
+listinsert1(newlist,toadd);
+start=start->next;
+}
+listprint2(newlist);
+listfree(s);
+listfree(newlist);
+}
+void twotwo(DList s)
+{
+DList newlist;
+node *start;
+node *cursor;
+node *finish;
+int contor,i;
+double m;
+listinit(newlist);
+start=s;
+while (finish!=NULL)
+{
+finish=start;
+for (i=0;i<5;i++) //pentru oricare k
+finish=finish->next;
+m=0; //media aritmetica
+contor=0;
+cursor=start;
+while (contor<5)
+{
+m=m+cursor->value;
+contor++;
+}
+m=m/5;
+listinsert1(newlist,m);
+start=start->next;
+}
+listprint2(newlist);
+listfree(s);
+listfree(newlist);
+}
+void three(DList s)
+{
+node *cursor,*q;
+double tdiff; //diferenta de timp
+listinit(s);
+listcreate2(s);
+cursor=s;
+cursor=cursor->next;
+while (cursor!=NULL)
+{
+    q=cursor->prev;
+tdiff=cursor->timestamp-q->timestamp;
+if(tdiff<100||tdiff>1000)
+{
+cursor->timestamp=(q->timestamp+cursor->timestamp)/2;
+cursor->value=(q->value+cursor->timestamp)/2;
+}
+}
+listprint3(s);
+listfree(s);
+}
+/*
+void four(DList s,double prag)
+{
+//de facut
+node *cursor,*q;
+node *st,*dr;
+node *lft,*rght,*stn;
+double i;
+double w;
+double C;
+double temp;
+double sum1,sum2;
+int j,l;
+listinit(s);
+listcreate2(s);
+cursor=s;
+while(cursor->next!=NULL)
+{
+    q=cursor->next;
+if (q->timestamp-cursor->timestamp>prag*1000)
+{
+i=cursor->timestamp;
+i=i+prag*1000/5;
+while (i<=q->timestamp)
+{
+listinsert3(s,i-prag*1000/5,i);
+st=s;
+dr=s;
+while(stn->timestamp!=i)
+{
+    stn=st->next;
+    st=st->next;
+}
+dr=st;
+for (j=0;j<3;j++)
+dr=dr->next;
+C=(i-st->timestamp)/(dr->timestamp-st->timestamp);
+lft=s;
+rght=s;
+while(rght!=NULL)
+rght=rght->next;
+for (j=0;j<3;j++)
+rght=rght->prev;
+for (j=0;j<3;j++)
+{
+w=(((j/(3-1))*(j/(3-1)))*0.9+0.1); //w(j,k)
+temp=0;
+for (l=j;l<=3;l++)
+temp=temp+(((j/(3-1))*(j/(3-1)))*0.9+0.1);
+w=w/temp;
+for (l=j;l<=3;l++)
+{
+//parcurgere ptr lft si rght in fct de l ul din for
+//w(i,k) in fct de l-ul din for
+}
+}
+}
+}
+}
+listprint3(s);
+listfree(s);
+}
+*/
+void five(DList s,double delta)
+{
+node *cursor;
+double stop;
+double first,last;
+double nr;
+listinit(s);
+listcreate2(s);
+cursor=s;
+while(cursor->next!=NULL)
+cursor=cursor->next;
+stop=cursor->timestamp;
+first=0;
+last=delta;
+while(last<=stop)
+{
+printf("\n");
+cursor=s;
+nr=0;
+while (cursor!=NULL)
+if (cursor->timestamp>=first&&cursor->timestamp<=last)
+nr++;
+printf("[%lf,%lf] %lf",first,last,nr);
+first=first+delta;
+last=last+delta;
+}
+listfree(s);
+}
+int main(int argc,char **argv)
+{
+    int i,k,j;
+    DList s;
+    char num[4];
+    double delta;
+    k=0; j=1;
+    /*for(i=1;i<argc;i++)
+    if(strcmp(argv[i],"--e1")==0)
+    one(s);
+    else
+    if(strcmp(argv[i],"--e2")==0)
+    twoone(s);
+    else
+    if(strcmp(argv[i],"--e3")==0)
+    twotwo(s);
+    else
+    if(strcmp(argv[i],"--u")==0)
+    three(s);
+    else
+    if(strcmp(argv[i],"--c")==0)
+    four(s);
+    else
+    if(strchr(argv[i],'s')==0)
+    {
+    num[k++]=s[j++];
+    for(j=0;j<strlen(num);j++)
+    delta=delta*10+num[j];
+    five(s,delta);
+    }
+    */
+    //one(s);
+    listinit(s);
+    listcreate1(s);
+    listprint1(s);
+    return 0;
+}

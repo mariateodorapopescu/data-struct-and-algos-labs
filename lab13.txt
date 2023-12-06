@@ -1,0 +1,137 @@
+//problema 1
+
+#include <stdio.h>
+#include <stdlib.h>
+
+int x[100], p[100], a[100][100], n, suma, s;
+
+void prob1(int k)
+{
+    for(int i = 1 ; i <= n ; ++i)
+        if(p[i]!=0)
+        {
+            p[i] = 1;
+            x[k] = i;
+            if(k == n)
+            {
+                s = 0;
+                for(int j = 1 ; j <= n ; j++)
+                    s += a[j][x[j]];
+                if(s>suma)
+                    suma= s;
+            }
+            else prob1(k + 1);
+            p[i] = 0;
+        }
+}
+
+int main()
+{
+    scanf("%d", &n);
+    for(int i =0 ; i < n ; i++)
+        for(int j = 0 ; j < n ; j++)
+            scanf("%d",a[i][j]);
+    prob1(1);
+    printf("%d", suma);
+    return 0;
+}
+
+
+//problema 2
+#include <stdio.h>
+
+void swap(int *a, int *b)
+{
+    int temp = *a;
+    *a = *b;
+    *b = temp;
+}
+
+void heap(int arr[], int n, int i)
+{
+    int largest = i;
+    int left = 2 * i + 1;
+    int right = 2 * i + 2;
+
+    if (left < n && arr[left] > arr[largest])
+        largest = left;
+    if (right < n && arr[right] > arr[largest])
+        largest = right;
+    if (largest != i)
+    {
+        swap(&arr[i], &arr[largest]);
+        heap(arr, n, largest);
+    }
+}
+
+void heapSort(int arr[], int n)
+{
+    for (int i = n / 2 - 1; i >= 0; i--)
+        heap(arr, n, i);
+    for (int i = n - 1; i >= 0; i--)
+    {
+        swap(&arr[0], &arr[i]);
+        heap(arr, i, 0);
+    }
+}
+
+
+void printArray(int arr[], int n)
+{
+    for (int i = 0; i < n; ++i)
+        printf("%d ", arr[i]);
+    printf("\n");
+}
+
+int main()
+{
+    int arr[] = {1, 2, 3, 4, 5, 6};
+    int n = sizeof(arr) / sizeof(arr[0]);
+
+    heapSort(arr, n);
+
+    printf("Sorted array is \n");
+    printArray(arr, n);
+}
+
+
+//problema 3
+#include <stdio.h>
+#include <stdlib.h>
+const int Inf = 99999;
+int n , m , ok   , c[101][101] , a[101][101] , x , y , w;
+
+void Floyd_Warshall()
+{
+    for (int k = 1; k <= n; ++k)
+        for (int i = 1; i <= n; ++i)
+            for (int j = 1; j <= n; ++j)
+                if (i != j && c[i][j] > c[i][k] + c[k][j])
+                    c[i][j] = c[i][k] + c[k][j];
+}
+int main()
+{
+    scanf("%d %d", &n, &m);
+    for (int i = 1; i <= n; ++i)
+        for (int j = 1; j <= n; ++j)
+            if (i != j)
+                c[i][j] = Inf;
+    for(int i = 1 ; i <= m ; i++)
+    {
+        scanf("%ld %ld %ld", &x, &y, &w);
+        c[x][y] = w;
+        a[x][y] = w;
+    }
+    Floyd_Warshall();
+    for (int i = 1; i <= n; ++i)
+       for (int j = 1; j <= n; ++j)
+            if(a[i][j] == c[i][j] && a[i][j] != 0)
+                ok++;
+    printf("%d", ok);
+    return 0;
+}
+
+
+
+
+
